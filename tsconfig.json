@@ -7,9 +7,13 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
-    "types": [],
+    
+    
+    "types": ["node"],
+    "target": "ESNext",           // Or a suitable target for your project
+    "module": "ESNext",            // Set to ESNext for modern syntax
+    "moduleResolution": "node",    // Use Node.js style resolution
+    "esModuleInterop": true,       // Enables interop between CommonJS and ES Modules
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
