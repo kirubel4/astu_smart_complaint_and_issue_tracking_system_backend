@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String      @id @default(uuid())
+  fullName  String
+  email     String      @unique
+  password  String
+  role      Role
+  createdAt DateTime    @default(now())
+
+  complaints      Complaint[] @relation("StudentComplaints")
+
+  assignedTickets Complaint[] @relation("StaffAssignments")
+
+  remarks         Remark[]
+}
+
+model Complaint {
+  id          String      @id @default(uuid())
+  title       String
+  description String
+  attachment  String?
+  status      Status      @default(OPEN)
+  createdAt   DateTime    @default(now())
+
+  studentId   String
+  student     User        @relation("StudentComplaints", fields: [studentId], references: [id])
+
+
+  staffId     String?
+  assignedTo  User?       @relation("StaffAssignments", fields: [staffId], references: [id])
+
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id])
+
+  remarks     Remark[]
+}
+
+model Category {
+  id          String       @id @default(uuid())
+  name        String        @unique
+  description String?
+  complaints  Complaint[]
+}
+
+model Remark {
+  id          String     @id @default(uuid())
+  message     String
+  createdAt   DateTime   @default(now())
+
+  complaintId String
+  complaint   Complaint  @relation(fields: [complaintId], references: [id])
+
+  staffId     String
+  staff       User       @relation(fields: [staffId], references: [id])
+}
+
+enum Role {
+  STUDENT
+  STAFF
+  ADMIN
+}
+
+enum Status {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
