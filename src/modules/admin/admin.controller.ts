@@ -1,12 +1,12 @@
 import type { Request, Response } from 'express';
-import { ApiResponseBuilder } from '../../common/utils/ApiResponse';
+import { ApiResponseBuilder } from '../../common/util/ApiResponse';
 import { AdminService } from './admin.service';
-import { AuthService } from '../auth/auth.service'; // Import if needed
+import { AuthService } from '../auth/auth.service'; 
 import { prisma } from '../../config/db.config';
 
 const authService = new AuthService();
 
-const adminService = new AdminService(prisma,authService); // Pass the instantiated AuthService
+const adminService = new AdminService(prisma,authService);
 
 export class AdminController {
   static async getAllComplaints(req: Request, res: Response) {
@@ -32,6 +32,102 @@ export class AdminController {
       return new ApiResponseBuilder().internalError(error.message).build(res);
     }
   }
+// create user
+  static async createNewUser(req: Request, res: Response) {
+    try {
+      const data = req.body;
+
+      const result = await adminService.createNewUser(data);
+
+      if (!result.ok) {
+        return new ApiResponseBuilder().badRequest(result.error).build(res);
+      }
+
+      return new ApiResponseBuilder()
+        .created('User created successfully')
+        .withData(result.data)
+        .build(res);
+    } catch (error: any) {
+      return new ApiResponseBuilder().internalError(error.message).build(res);
+    }
+  }
+// get users
+  static async getAllUsers(req: Request, res: Response) {
+    try {
+      const result = await adminService.getAllUsers();
+
+      if (!result.ok) {
+        return new ApiResponseBuilder().badRequest(result.error).build(res);
+      }
+
+      return new ApiResponseBuilder()
+        .ok('Users retrieved successfully')
+        .withData(result.data)
+        .build(res);
+    } catch (error: any) {
+      return new ApiResponseBuilder().internalError(error.message).build(res);
+    }
+  }
+// by id get users
+  static async getUserByID(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const result = await adminService.getUserByID(id as string);
+
+      if (!result.ok) {
+        return new ApiResponseBuilder().badRequest(result.error).build(res);
+      }
+
+      return new ApiResponseBuilder()
+        .ok('User retrieved successfully')
+        .withData(result.data)
+        .build(res);
+    } catch (error: any) {
+      return new ApiResponseBuilder().internalError(error.message).build(res);
+    }
+  }
+
+  // update user role
+  static async updateUserRole(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { role } = req.body;
+
+      const result = await adminService.updateUserRole(id as string, role);
+
+      if (!result.ok) {
+        return new ApiResponseBuilder().badRequest(result.error).build(res);
+      }
+
+      return new ApiResponseBuilder()
+        .ok('User role updated successfully')
+        .withData(result.data)
+        .build(res);
+    } catch (error: any) {
+      return new ApiResponseBuilder().internalError(error.message).build(res);
+    }
+  }
+
+  // remove users
+  static async removeUser(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const result = await adminService.removeUser(id as string);
+
+      if (!result.ok) {
+        return new ApiResponseBuilder().badRequest(result.error).build(res);
+      }
+
+      return new ApiResponseBuilder()
+        .ok('User deleted successfully')
+        .withData(result.data)
+        .build(res);
+    } catch (error: any) {
+      return new ApiResponseBuilder().internalError(error.message).build(res);
+    }
+  }
 
   static async getComplaintById(req: Request, res: Response) {
     try {
@@ -51,6 +147,7 @@ export class AdminController {
     }
   }
 
+  // assign complaint to staff
   static async assignComplaintToStaff(req: Request, res: Response) {
     try {
       const { complaintId, staffId } = req.body;
