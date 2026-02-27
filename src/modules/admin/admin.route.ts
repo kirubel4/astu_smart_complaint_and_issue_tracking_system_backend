@@ -1,13 +1,18 @@
 import { Router } from 'express';
 import { AdminController } from './admin.controller';
-const router = Router();
+const adminRouter = Router();
 
-router.get('/complaints', AdminController.getAllComplaints);
-router.get('/complaints/:id', AdminController.getComplaintById);
-router.post('/complaints/assign', AdminController.assignComplaintToStaff);
-router.post('/complaints/reassign', AdminController.reassignComplaint);
-router.post('/complaints/status', AdminController.updateComplaintStatus);
-router.delete('/complaints/:id', AdminController.deleteComplaint);
-router.get('/complaints-analytics', AdminController.getComplaintAnalytics);
+adminRouter.post('/users', AdminController.createNewUser);
+adminRouter.get('/users', AdminController.getAllUsers);       
+adminRouter.get('/users/:id', AdminController.getUserByID);   
+adminRouter.put('/users/:id/role', AdminController.updateUserRole); 
+adminRouter.delete('/users/:id', AdminController.removeUser);  
+adminRouter.get('/complaints', AdminController.getAllComplaints);
+adminRouter.get('/complaints/:id', AdminController.getComplaintById);
+adminRouter.post('/complaints/assign', AdminController.assignComplaintToStaff);
+adminRouter.post('/complaints/reassign', AdminController.reassignComplaint);
+adminRouter.post('/complaints/status', AdminController.updateComplaintStatus);
+adminRouter.delete('/complaints/:id', AdminController.deleteComplaint);
+adminRouter.get('/complaints-analytics', AdminController.getComplaintAnalytics);
 
-export default router;
+export default adminRouter;

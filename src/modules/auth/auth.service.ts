@@ -1,6 +1,6 @@
 import { use } from "react";
 import { Role } from "../../../generated/prisma";
-import { ApiResponseBuilder } from "../../common/utils/ApiResponse";
+import { ApiResponseBuilder } from "../../common/util/ApiResponse";
 import { prisma } from "../../config/db.config";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -73,7 +73,8 @@ export class AuthService {
         const accessPayLoad = {
             fullName: user.fullName,
             role: user.role,
-            id: user.id
+            id: user.id,
+            email: user.email
         }
 
         const token = jwt.sign(accessPayLoad, process.env.ACCESS_SECRET!, {
