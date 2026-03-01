@@ -2,12 +2,13 @@ import { Router } from "express";
 import { NotificationController } from "./notification.controller";
 import { authMiddleware } from "../../middleware/auth.middleware";
 
-const router = Router();
+const notificationRouter = Router();
 
+notificationRouter.post("/", authMiddleware, NotificationController.createNotification);
 // Get all notifications of logged user
-router.get("/", authMiddleware, NotificationController.getMyNotifications);
+notificationRouter.get("/", authMiddleware, NotificationController.getMyNotifications);
 
 // Mark one notification as read
-router.patch("/:id/read", authMiddleware, NotificationController.markAsRead);
+notificationRouter.patch("/:id/read", authMiddleware, NotificationController.markAsRead);
 
-export default router;
+export default notificationRouter;

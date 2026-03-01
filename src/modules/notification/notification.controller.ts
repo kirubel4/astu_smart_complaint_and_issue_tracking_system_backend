@@ -5,6 +5,23 @@ import { ApiResponseBuilder } from "../../common/util/ApiResponse";
 const notificationService = new NotificationService();
 
 export class NotificationController {
+
+  static async createNotification(req: Request, res: Response) {
+    try {
+      const userId = req.user?.id!;
+      const { message } = req.body;
+
+      if (!message) {
+        return new ApiResponseBuilder().badRequest("Message is required").build(res);
+      }
+
+      const notification = await notificationService.sendNotification(userId, message);
+      
+      return new ApiResponseBuilder().created("Notification created").withData(notification).build(res);
+    } catch (err: any) {
+      return new ApiResponseBuilder().internalError(err.message).build(res);
+    }
+  }
   static async getMyNotifications(req: Request, res: Response) {
     try {
       const userId = req.user?.id!;
