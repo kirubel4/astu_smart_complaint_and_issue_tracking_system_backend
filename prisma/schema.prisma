@@ -20,6 +20,8 @@ model User {
   assignedTickets Complaint[] @relation("StaffAssignments")
 
   remarks         Remark[]
+  notifications Notification[]
+
 }
 
 model Complaint {
@@ -43,7 +45,16 @@ model Complaint {
   remarks     Remark[]
   
 }
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
 
+  user User @relation(fields: [userId], references: [id])
+}
 model Category {
   id          String       @id @default(uuid())
   name        String        @unique

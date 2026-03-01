@@ -1,4 +1,6 @@
 import { prisma } from "../../config/db.config";
+import bcrypt from "bcryptjs";
+
 export class StudentService {
     constructor(
         private prismaService = prisma) {}
@@ -19,9 +21,17 @@ export class StudentService {
 
   // Update student profile
   async updateProfile(studentId: string, data: any) {
+    const updateData: any = { ...data };
+
+    if (typeof updateData.password === "string" && updateData.password.trim() !== "") {
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    } else {
+      delete updateData.password;
+    }
+
     return await this.prismaService.user.update({
       where: { id: studentId },
-      data,
+      data: updateData,
       select: {
         id: true,
         fullName: true,
