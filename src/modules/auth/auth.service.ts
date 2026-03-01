@@ -46,15 +46,25 @@ export class AuthService {
       };
     }
   }
+  async login(password: string, email: string) {
+    try {
+      const user = await this.prismaService.user.findUnique({
+        where: { email },
+      });
 
-  async login(
-    password: string,
-    email: string
-  ){
-    try{
-        const user = await this.prismaService.user.findUnique({
-            where: {email}
-        });
+      if (!user) {
+        return {
+          ok: false,
+          error: "Invalid credential",
+        };
+      }
+      const isPasswordValid = await bcrypt.compare(password, user.password);
+      if (!isPasswordValid) {
+        return {
+          ok: false,
+          error: "password invalid",
+        };
+      }
 
         if (!user){
             return {
@@ -77,24 +87,72 @@ export class AuthService {
             email: user.email
         }
 
-        const token = jwt.sign(accessPayLoad, process.env.ACCESS_SECRET!, {
+      const token = jwt.sign(accessPayLoad, process.env.ACCESS_SECRET!, {
         expiresIn: "59m",
-      })
-        return{
-            ok: true,
-            data:{
-                id: user.id,
-                fullName: user.fullName,
-                aToken: token,
-                role: user.role,
-                email: user.email
-            }
-        }
-    }catch(error: any){
+      });
+      return {
+        ok: true,
+        data: {
+          id: user.id,
+          fullName: user.fullName,
+          aToken: token,
+          role: user.role,
+          email: user.email,
+        },
+      };
+    } catch (error: any) {
+      return {
+        ok: false,
+        error: error.message,
+      };
+    }
+  }
+
+  async changePassword(
+    email: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    try {
+      const user = await this.prismaService.user.findUnique({
+        where: { email },
+      });
+
+      if (!user) {
+        return {
+          ok: false,
+          error: "no user in this email",
+        };
+      }
+
+      const isPasswordValid = await bcrypt.compare(
+        currentPassword,
+        user.password,
+      );
+
+      if (!isPasswordValid){
         return {
             ok: false,
-            error: error.message
+            error: "password invalid"
+        }
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      const changePassword = await this.prismaService.user.update({
+        where: {email},
+        data: {password: hashedPassword},
+      });
+
+      return {
+        ok: true,
+        data: changePassword
+      }
+    } catch (error: any) {
+        return{
+            ok: false,
+            error: error.message,
         }
     }
   }
 }
+
